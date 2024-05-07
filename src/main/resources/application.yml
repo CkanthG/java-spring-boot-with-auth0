@@ -1,0 +1,8 @@
+okta:
+  oauth2:
+    issuer: https://dev-klozqcyixv5zgyqe.eu.auth0.com/
+    client-id: IpgwJDidQtNH29EsRQIX1E8iX7TgTuCo
+    client-secret: Z8yEyvjZ4wReSPE5-i_bbnL6m3rpmUypb_xKkAoXir3CMy7e2h8REwE58nWRONQ5
+
+server:
+  port: 4000
