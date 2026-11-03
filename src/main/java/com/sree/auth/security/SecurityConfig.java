@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -17,9 +18,9 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${okta.oauth2.issuer}")
+    @Value("${spring.security.oauth2.client.provider.auth0.issuer-uri}")
     private String issuer;
-    @Value("${okta.oauth2.client-id}")
+    @Value("${spring.security.oauth2.client.registration.auth0.client-id}")
     private String clientId;
 
     @Bean
@@ -36,9 +37,16 @@ public class SecurityConfig {
 
     private LogoutHandler logoutHandler() {
         return ((request, response, authentication) -> {
+            String returnTo = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+            String logoutUrl = UriComponentsBuilder.fromUriString(issuer)
+                    .pathSegment("v2", "logout")
+                    .queryParam("client_id", clientId)
+                    .queryParam("returnTo", returnTo)
+                    .build()
+                    .encode()
+                    .toUriString();
             try {
-                String url = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-                response.sendRedirect(issuer + "v2/logout?client_id"+clientId+"&returnTo="+url);
+                response.sendRedirect(logoutUrl);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
